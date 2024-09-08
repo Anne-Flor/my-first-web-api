@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PutMapping;
+
 
 import demo.my_first_web_api.Repository.UsuarioRepository;
 
@@ -37,6 +39,11 @@ public class UsuarioController {
 
     @PostMapping()
     public void postuser(@RequestBody Usuario usuario){
+        repository.save(usuario);
+    }
+
+    @PutMapping()
+    public void putuser(@RequestBody Usuario usuario){
         repository.save(usuario);
     }
 }
