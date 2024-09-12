@@ -5,11 +5,19 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
+import demo.my_first_web_api.handler.BusinessException;
+import demo.my_first_web_api.handler.CampoObrigatorioException;
 import demo.my_first_web_api.model.Usuario;
 
 @Repository
 public class UsuarioRepository {
     public void save(Usuario usuario){
+        if (usuario.getLogin()== null) {
+            throw new CampoObrigatorioException("Login");
+        }
+        if (usuario.getPassword()== null) {
+            throw new CampoObrigatorioException("password");
+        }
         if(usuario.getId()== 0)
             System.out.println("SAVE - Recebendo o usuário na camada de repositório");
             else
