@@ -17,7 +17,7 @@ import jakarta.annotation.Resource;
 import net.bytebuddy.asm.Advice.Return;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Resource
     private MessageSource messageSource;
     private HttpHeaders headers(){
@@ -35,14 +35,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     private ResponseEntity<Object> handleGeneral(Exception e, WebRequest request){
-        if (e.getClass().isAssignableFrom(UndeclaredThrowableException.class));
-        UndeclaredThrowableException exception = (UndeclaredThrowableException) e;
-        return handleBusinessException((BusinessException)exception.getUndeclaredThrowable(), request); 
-    } else {
-        String message = MessageSource.getMessage("error.server", new Object[]{e.getMessage(), null});
-        ResponseError responseError = responseError(message, HttpStatus.INTERNAL_SERVER_ERROR);
-        Return handleExceptionInternal(e, error, headers(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+        if (e.getClass().isAssignableFrom(UndeclaredThrowableException.class)) {
+            UndeclaredThrowableException exception = (UndeclaredThrowableException) e;
+            return handleBusinessException((BusinessException) exception.getUndeclaredThrowable(), request); 
+        } else {
+            String message = messageSource.getMessage("error.server", new Object[]{e.getMessage(), null}, request.getLocale());
+            ResponseError responseError = responseError(message, HttpStatus.INTERNAL_SERVER_ERROR);
+            return handleExceptionInternal(e, responseError, headers(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+        }
     }
+    
 
     @ExceptionHandler({BusinessException.class})
     private ResponseEntity<Object> handleBusinessException(BusinessException e, WebRequest request){
